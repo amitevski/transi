@@ -1,4 +1,4 @@
-class lucid64 {
+class transi {
     
   include ntp
   include timezone
@@ -70,6 +70,6 @@ class lucid64 {
 
 }
 
-include lucid64
+include transi
 
 
