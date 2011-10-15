@@ -1,0 +1,10 @@
+{
+  "env": {
+    "default": {
+      "db": "http://transi.dev/app-dev"
+    },
+    "production": {
+      "db": "http://admin:admin@transi.dev/app"
+    }
+  }
+}
