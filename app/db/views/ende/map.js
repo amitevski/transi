@@ -1,6 +1,10 @@
 function(doc) {
-    if ('translation' == doc.type && doc.englishText &&
-    	doc.germanText && doc.germanRating) {
-        emit(doc.englishText, doc);
+  if (doc.lang == 'en') {
+    emit(doc.en, null);
+    if (doc.de) {
+        for (var i in doc.de) {
+            emit(doc.en, {_id: doc.de[i]._id});
+        }
     }
+  }
 }
