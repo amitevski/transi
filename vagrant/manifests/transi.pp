@@ -98,6 +98,7 @@ class transi {
 
   service { "couchdb":
     ensure => running,
+    require => Package["couchdb"],
   }
   
   service { "nginx":
