@@ -4,3 +4,4 @@
 .tmp*
 vagrant/.DS_Store
 vagrant/.vagrant
+.idea/*
