@@ -95,15 +95,19 @@ Backbone.couch = {
       query = this.ddocName + "/" + viewName;
     // if descending not defined set default false
     collection.descending || ( collection.descending = false );
+	collection.include_docs || ( collection.include_docs = true );
 
     var options = {
       descending: collection.descending,
+      include_docs: collection.include_docs,
       success: function( result ) {
         var models = [];
-        // for each result row, build model
-        // compilant with backbone
+        // custom implementation for transi
         _.each( result.rows, function( row ) {
-          var model = row.value;
+          var model = row.doc;
+          if (row.value && row.value.rating) {
+              model.rating = row.value.rating;
+          }
           if ( !model.id ) { model.id = row.id }
           models.push( model );
         });

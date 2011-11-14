@@ -217,10 +217,17 @@ td { vertical-align: top; }
 
 #searchBox {
 	position: relative;
-	top: 150px;
+	top: 15em;
 }
 
+#searchResults {
+    position: relative;
+    top: 17em;
+}
 
+ul {
+    list-style: none;
+}
 
 
 

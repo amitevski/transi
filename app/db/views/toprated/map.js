@@ -10,7 +10,7 @@ function(doc) {
             	highest = j;
 		    }
 	    }
-        emit(doc.word, {"_id": doc.translations[i][highest]._id});
+        emit(doc.word, {"_id": doc.translations[i][highest]._id, "rating":doc.translations[i][highest].rating});
         highest = '0';
     }
 }

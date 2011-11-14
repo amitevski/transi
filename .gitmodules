@@ -1,0 +1,3 @@
+[submodule "app/js/vendor/jquery.couch"]
+	path = app/js/vendor/jquery.couch
+	url = git://github.com/daleharvey/jquery.couch.js.git
