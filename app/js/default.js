@@ -59,27 +59,25 @@
     el: $("#searchResults"),
 
     events : {
-      "click #refresh": "refresh",
       "keyup #searchInput": "search"
     },
 
     initialize: function() {
         this.items_element = $("#translation-list");
-        _.bindAll(this, 'render', 'refresh', 'search');
+        _.bindAll(this, 'render', 'search');
         translations.bind('refresh', this.render);
         translations.fetch();
         this.render();
     },
 
-    refresh: function () {
-        this.render();
-        return false;
-    },
 
     search: function(e) {
-      var input = $("#searchInput");
-      var searchText = input.val();
-      translations.fetch({startkey:searchText, endkey:searchText+'\u9999'});
+        var input = $("#searchInput");
+        var searchText = input.val();
+        translations.startkey = searchText,
+        translations.endkey = searchText+'\u9999';
+        translations.fetch();
+        this.render();
     },
 
     render: function () {

@@ -117,6 +117,10 @@ Backbone.couch = {
       },
       error: _error
     };
+      if (collection.startkey && collection.endkey) {
+            options.startkey = collection.startkey;
+            options.endkey = collection.endkey;
+       }
     if (collection.limit) { options.limit = collection.limit; }
     db.view(query, options);
 
