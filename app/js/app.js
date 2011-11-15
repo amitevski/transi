@@ -12,11 +12,11 @@
             console.log("restarting...");
         }
     window.location.reload();
-	});
-	
+    });
+    
     var Translation = Backbone.Model.extend({
         url: "word",
-    	defaults: {
+        defaults: {
             rating: '0',
             example: 'Example sentence'
         }
@@ -24,7 +24,8 @@
     
     var TranslationList = Backbone.Collection.extend({
         url: "toprated",
-        model: Translation
+        model: Translation,
+        targetLanguage: 'de'
     });
     
     var translations = new TranslationList();
@@ -32,8 +33,7 @@
     var translationView = Backbone.View.extend({
         tagName: "li",
 
-        template: _.template('<span class="rating"><%= rating %></span> <span class="word"><%= word %></span> <br />' +
-                             '<span class="example"><%= example %></span>'),
+        template: _.template('<span class="word"><%= word %></span>'),
 
         initialize: function() {
           _.bindAll(this, 'render', 'unrender');
@@ -59,25 +59,37 @@
     el: $("#searchResults"),
 
     events : {
-      "keyup #searchInput": "search"
+        "keyup #searchInput": "search",
+        "change #targetLanguage": "changeLang"
     },
 
     initialize: function() {
         this.items_element = $("#translation-list");
-        _.bindAll(this, 'render', 'search');
+        _.bindAll(this, 'render', 'search', 'changeLang');
         translations.bind('refresh', this.render);
         translations.fetch();
-        this.render();
     },
 
+    changeLang: function(e) {
+        translations.targetLanguage = $("#targetLanguage").val();
+        console.log('selected lang' + translations.targetLanguage);
+    },
 
     search: function(e) {
         var input = $("#searchInput");
         var searchText = input.val();
+        if (searchText.length < 3) {
+            this.unrender();
+            return;
+        }
         translations.startkey = searchText,
         translations.endkey = searchText+'\u9999';
         translations.fetch();
         this.render();
+    },
+
+    unrender: function() {
+        this.items_element.html("");
     },
 
     render: function () {
@@ -85,9 +97,9 @@
       this.items_element.html("");
       var that = this;
       translations.each(function(item) {
-      var view = new translationView({model: item}),
-          el = view.render(this.search).el;
-      that.items_element.prepend(el);
+          var view = new translationView({model: item}),
+              el = view.render(this.search).el;
+          that.items_element.prepend(el);
       });
     }
 

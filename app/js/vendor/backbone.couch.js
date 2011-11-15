@@ -104,7 +104,7 @@ Backbone.couch = {
       success: function( result ) {
         var models = [];
         // custom implementation for transi
-        _.each( result.rows, function( row ) {
+        _.each( result.rows, function( row, key, result ) {
           var model = row.doc;
           if (row.value && row.value.rating) {
               model.rating = row.value.rating;
