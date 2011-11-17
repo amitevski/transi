@@ -92,9 +92,11 @@ Backbone.couch = new function () {
       query = settings.ddocName + "/" + viewName;
     // if descending not defined set default false
     collection.descending || ( collection.descending = false );
+    collection.include_docs || ( collection.include_docs = true );
 
     var options = {
       descending: collection.descending,
+      include_docs: collection.include_docs,
       success: function( result ) {
         var models = [];
         // for each result row, build model

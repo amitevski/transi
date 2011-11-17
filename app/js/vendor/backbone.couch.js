@@ -1,6 +1,6 @@
-// Backbone.couch.js - literal version - (c) 2011 Andrzej Sliwa
+// Backbone.couch.js - literal version - with some modifications for transi
 //
-// Based on Jan Monschke backbone.couchdb.js connector with some improvements.
+// Based on Andrzej Sliwa,Jan Monschke backbone.couchdb.js connector with some improvements.
 //
 //   Example configuration:
 //
@@ -12,6 +12,7 @@
 //          console.log("restarting...");
 //          window.location.reload();
 //        });
+
 
 Backbone.couch = {
 
@@ -95,15 +96,19 @@ Backbone.couch = {
       query = this.ddocName + "/" + viewName;
     // if descending not defined set default false
     collection.descending || ( collection.descending = false );
+    collection.include_docs || ( collection.include_docs = true );
 
     var options = {
       descending: collection.descending,
+      include_docs: collection.include_docs,
       success: function( result ) {
         var models = [];
-        // for each result row, build model
-        // compilant with backbone
-        _.each( result.rows, function( row ) {
-          var model = row.value;
+        // custom implementation for transi
+        _.each( result.rows, function( row, key, result ) {
+          var model = row.doc;
+          if (row.value && row.value.rating) {
+              model.rating = row.value.rating;
+          }
           if ( !model.id ) { model.id = row.id }
           models.push( model );
         });
@@ -113,6 +118,10 @@ Backbone.couch = {
       },
       error: _error
     };
+      if (collection.startkey && collection.endkey) {
+            options.startkey = collection.startkey;
+            options.endkey = collection.endkey;
+       }
     if (collection.limit) { options.limit = collection.limit; }
     db.view(query, options);
 

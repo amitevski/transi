@@ -5,11 +5,11 @@ function(doc) {
         for (var j in doc.translations[i]) {
             if ('0' === highest || 
                 doc.translations[i][highest].rating < doc.translations[i][j].rating)
-            {
-                highest = j;
-            }
-        }
-        emit(doc.word, {"_id": doc.translations[i][highest]._id});
+		    {
+            	highest = j;
+		    }
+	    }
+        emit(doc.word, {"_id": doc.translations[i][highest]._id, "rating":doc.translations[i][highest].rating});
         highest = '0';
     }
 }
