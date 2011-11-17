@@ -217,12 +217,12 @@ td { vertical-align: top; }
 
 #searchBox {
 	position: relative;
-	top: 15em;
+	top: 3em;
 }
 
 #searchResults {
     position: relative;
-    top: 17em;
+    top: 2em;
 }
 
 ul {
