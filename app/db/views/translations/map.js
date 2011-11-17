@@ -1,6 +1,16 @@
-//only return top rated translations
+/*
+ * This map function is emitting a document specified by id and all the
+ * associated translations in a given language
+ */
 function(doc) {
-    /*emit(doc.word, null);*/
+    // just emit the document and the id.
+    emit(doc._id, doc)
+}
+/*
+function 
+    
+    
+    /*emit(doc.word, null);
     for (var i in doc.translations) {
         var highest = '0';
         for (var j in doc.translations[i]) {
@@ -14,4 +24,4 @@ function(doc) {
         highest = '0';
     }
 }
-
+*/
