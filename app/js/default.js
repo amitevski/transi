@@ -3,7 +3,6 @@
     Backbone.couch.databaseName = "app-dev";
     Backbone.couch.ddocName = "app";
     Backbone.couch.enableChangesFeed = true;
-    Backbone.couch.include_docs = true;
     Backbone.couch.debug = true;
     
     Backbone.couch.ddocChange(function(ddocName){
@@ -25,15 +24,17 @@
     var TranslationList = Backbone.Collection.extend({
         url: "toprated",
         model: Translation,
-        targetLanguage: 'de'
+        targetLanguage: 'en',
+        include_docs: true
     });
     
-    var translations = new TranslationList();
+    var translationList = new TranslationList();
 
     var translationView = Backbone.View.extend({
         tagName: "li",
 
-        template: _.template('<span class="word"><%= word %></span>'),
+        template: _.template('<span class="word"><%= word %></span>' + ' - ' +
+                             '<span class="translation"><%= translation %></span>'),
 
         initialize: function() {
           _.bindAll(this, 'render', 'unrender');
@@ -47,10 +48,16 @@
         },
 
         render: function() {
-          var el = $(this.el);
-          el.html(this.template(this.model.toJSON()));
-          this.model.el = el;
-          return this;
+            var model = this.model.toJSON();
+            if (!model.translations ||
+                !model.translations[translationList.targetLanguage]) {
+                return this;
+            }
+            model.translation = model.translations[translationList.targetLanguage][0].word;
+            var el = $(this.el);
+            el.html(this.template(model));
+            this.model.el = el;
+            return this;
         }
 
     });
@@ -66,13 +73,13 @@
     initialize: function() {
         this.items_element = $("#translation-list");
         _.bindAll(this, 'render', 'search', 'changeLang');
-        translations.bind('refresh', this.render);
-        translations.fetch();
+        translationList.bind('refresh', this.render);
     },
 
     changeLang: function(e) {
-        translations.targetLanguage = $("#targetLanguage").val();
-        console.log('selected lang' + translations.targetLanguage);
+        translationList.targetLanguage = $("#targetLanguage").val();
+        this.render();
+        console.log('selected lang' + translationList.targetLanguage);
     },
 
     search: function(e) {
@@ -82,9 +89,9 @@
             this.unrender();
             return;
         }
-        translations.startkey = searchText,
-        translations.endkey = searchText+'\u9999';
-        translations.fetch();
+        translationList.startkey = searchText,
+        translationList.endkey = searchText+'\u9999';
+        translationList.fetch();
         this.render();
     },
 
@@ -96,9 +103,9 @@
       //translations.models = translations.models.slice(0, translations.limit);
       this.items_element.html("");
       var that = this;
-      translations.each(function(item) {
+      translationList.each(function(item) {
           var view = new translationView({model: item}),
-              el = view.render(this.search).el;
+              el = view.render().el;
           that.items_element.prepend(el);
       });
     }
