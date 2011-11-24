@@ -1,0 +1,14 @@
+{"docs":[
+{"_id":"de_Bildschirm","lang":"de","word":"Bildschirm","type":"word",
+    "translations":{"en":[{"_id":"en_Screen","rating":"10"}],
+    "mk": [{"_id":"mk_Ekran", "ratin":"10"}]},
+    "example":"Der Bidlschirm hat eine gute Aufl\u00f6sung!","type":"word"},
+{"_id":"en_Screen","lang":"en","example":"The Screen is nice","word":"Screen",
+    "translations":{"de":[{"_id":"de_Bildschirm","rating":"14"}],
+        "mk": [{"_id":"mk_Ekran", "ratin":"10"}]}, "type":"word"},
+{"_id":"en_Scrum","lang":"en","word":"Scrum","type":"word"},
+{"_id":"mk_Ekran","lang":"mk","example":"Ekranot ima dobra rezolucija","word":"Ekran", "type":"word",
+    "translations":{"en":[{"_id":"en_Screen","rating":"22"}],
+    "de":[{"_id":"de_Bildschirm","rating":"12"}]}}
+         ]
+}
