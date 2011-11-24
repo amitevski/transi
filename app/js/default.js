@@ -18,19 +18,30 @@
         defaults: {
             rating: '0',
             example: 'Example sentence'
+        },
+
+        /**
+         * find the toprated translation
+         *
+         * @param  string lang : language to search in
+         * @return model  translation object
+         */
+        getToprated: function(lang) {
+            var translations = this.get('translations');
+            if (!translations[lang]) {return null;}
+            return  _.max(translations[lang], function(translation){return translation.rating;});
         }
     });
     
     var TranslationList = Backbone.Collection.extend({
-        url: "toprated",
+        url: "en",
         model: Translation,
-        targetLanguage: 'en',
         include_docs: true
     });
     
     var translationList = new TranslationList();
 
-    var translationView = Backbone.View.extend({
+    var searchResultView = Backbone.View.extend({
         tagName: "li",
 
         template: _.template('<span class="word"><%= word %></span>' + ' - ' +
@@ -50,10 +61,10 @@
         render: function() {
             var model = this.model.toJSON();
             if (!model.translations ||
-                !model.translations[translationList.targetLanguage]) {
+                !model.translations[translationList.url]) {
                 return this;
             }
-            model.translation = model.translations[translationList.targetLanguage][0].word;
+            model.translation = this.model.getToprated(translationList.url).word;
             var el = $(this.el);
             el.html(this.template(model));
             this.model.el = el;
@@ -62,7 +73,7 @@
 
     });
 
-    var allTranslationsView = Backbone.View.extend({
+    var allSearchResultsView = Backbone.View.extend({
     el: $("#searchResults"),
 
     events : {
@@ -76,13 +87,13 @@
         translationList.bind('refresh', this.render);
     },
 
-    changeLang: function(e) {
-        translationList.targetLanguage = $("#targetLanguage").val();
-        this.render();
-        console.log('selected lang' + translationList.targetLanguage);
+    changeLang: function() {
+        translationList.url = $("#targetLanguage").val();
+        this.search();
+        console.log('selected lang' + translationList.url);
     },
 
-    search: function(e) {
+    search: function() {
         var input = $("#searchInput");
         var searchText = input.val();
         if (searchText.length < 3) {
@@ -104,14 +115,14 @@
       this.items_element.html("");
       var that = this;
       translationList.each(function(item) {
-          var view = new translationView({model: item}),
-              el = view.render().el;
+          var view = new searchResultView({model: item}),
+              el = view.render(this.search).el;
           that.items_element.prepend(el);
       });
     }
 
   });
-  new allTranslationsView();
+  new allSearchResultsView();
 
 })(jQuery);
 
