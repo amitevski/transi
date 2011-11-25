@@ -106,9 +106,6 @@ Backbone.couch = {
         // custom implementation for transi
         _.each( result.rows, function( row, key, result ) {
           var model = row.doc;
-          if (row.value && row.value.rating) {
-              model.rating = row.value.rating;
-          }
           if ( !model.id ) { model.id = row.id }
           models.push( model );
         });

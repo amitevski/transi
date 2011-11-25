@@ -79,7 +79,10 @@
                 !model.translations[translationList.url]) {
                 return this;
             }
-            model.translation = this.model.getToprated(translationList.url).word;
+            var toprated = this.model.collection.get(
+                                this.model.getToprated(translationList.url)._id);
+
+            model.translation = toprated.get('word');
             var el = $(this.el);
             el.html(this.template(model));
             this.model.el = el;
@@ -117,8 +120,8 @@
             }
             translationList.startkey = searchText,
             translationList.endkey = searchText+'\u9999';
-            translationList.fetch();
-            this.render();
+            translationList.fetch({success: _.bind(this.render, this)});
+            //this.render();
         },
 
         unrender: function() {

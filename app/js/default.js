@@ -32,6 +32,15 @@
             return  _.max(translations[lang], function(translation){return translation.rating;});
         },
 
+        /**
+         * add a single translation
+         *
+         * add _id, rating of new translation to current model
+         * then add current models _id, rating:0 to new translation[this.lang]
+         * create new model in collection this.collection.create()
+         *
+         * @param translation
+         */
         addTranslation: function(translation) {
             this.translations[translation.lang].push(translation);
             console.log(translation);
@@ -70,7 +79,10 @@
                 !model.translations[translationList.url]) {
                 return this;
             }
-            model.translation = this.model.getToprated(translationList.url).word;
+            var toprated = this.model.collection.get(
+                                this.model.getToprated(translationList.url)._id);
+
+            model.translation = toprated.get('word');
             var el = $(this.el);
             el.html(this.template(model));
             this.model.el = el;
@@ -108,8 +120,8 @@
             }
             translationList.startkey = searchText,
             translationList.endkey = searchText+'\u9999';
-            translationList.fetch();
-            this.render();
+            translationList.fetch({success: _.bind(this.render, this)});
+            //this.render();
         },
 
         unrender: function() {
