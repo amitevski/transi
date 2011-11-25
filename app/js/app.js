@@ -121,7 +121,6 @@
             translationList.startkey = searchText,
             translationList.endkey = searchText+'\u9999';
             translationList.fetch({success: _.bind(this.render, this)});
-            //this.render();
         },
 
         unrender: function() {
