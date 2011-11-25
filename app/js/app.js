@@ -30,7 +30,22 @@
             var translations = this.get('translations');
             if (!translations[lang]) {return null;}
             return  _.max(translations[lang], function(translation){return translation.rating;});
+        },
+
+        /**
+         * add a single translation
+         *
+         * add _id, rating of new translation to current model
+         * then add current models _id, rating:0 to new translation[this.lang]
+         * create new model in collection this.collection.create()
+         *
+         * @param translation
+         */
+        addTranslation: function(translation) {
+            this.translations[translation.lang].push(translation);
+            console.log(translation);
         }
+
     });
     
     var TranslationList = Backbone.Collection.extend({

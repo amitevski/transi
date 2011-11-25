@@ -30,7 +30,13 @@
             var translations = this.get('translations');
             if (!translations[lang]) {return null;}
             return  _.max(translations[lang], function(translation){return translation.rating;});
+        },
+
+        addTranslation: function(translation) {
+            this.translations[translation.lang].push(translation);
+            console.log(translation);
         }
+
     });
     
     var TranslationList = Backbone.Collection.extend({

@@ -44,25 +44,54 @@ Backbone.couch = {
       console.log( "Backbone.couch - " + message );
     }
   },
-
-  create: function( model, _success, _error ) {
-    this.log( "create" );
-
-    var db = this.db(),
-      data = model.toJSON();
-    if ( !data.type ) { data.type = this.getType( model ); }
-    if ( !data.id && data._id ) { data.id = data._id; }
-    db.saveDoc( data, {
-      success: function( respone ){
-        _success( {
-          "id": respone.id,
-          "_id": respone.id,
-          "_rev": respone.rev
+    cleanUpRelation: function(relation, whitelist) {
+        _.each(relation, function(value, key, relation) {
+            if (false === _.include(whitelist, key)) {
+                delete relation[key];
+            }
         });
-      },
-      error: _error
-    });
-  },
+    },
+
+    create: function( model, _success, _error ) {
+        this.log( "create" );
+
+        var db = this.db(),
+        data = model.toJSON();
+
+        var models = [];
+        var that = this;
+        //check if we have relation docs attached
+        if (data.translations[model.collection.url]) {
+          //split models if a whole model is included
+          _.each(data.translations[model.collection.url], function(relation) {
+              if (model.url == relation.type) {
+                models.push(_.clone(relation));
+                that.cleanUpRelation(relation, ['_id', 'rating']);
+              }
+          });
+        }
+        models.push(data);
+
+
+        _.each(models, function(modelData) {
+            if ( !modelData.type ) { modelData.type = that.getType( model ); }
+            if ( !modelData.id && modelData._id ) { modelData.id = modelData._id; }
+            db.saveDoc( modelData, {
+              success: function( respone ){
+                _success( {
+                  "id": respone.id,
+                  "_id": respone.id,
+                  "_rev": respone.rev
+                });
+              },
+              error: _error
+            });
+      });
+
+
+
+
+    },
 
   getType: function( model ) {
     return model.url;
