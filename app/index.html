@@ -43,18 +43,23 @@
     <div id="main" role="main">
 
 		<section id="searchResults">
-            <select id="targetLanguage">
+            <label for="targetLang">Select Target Language</label>
+            <select name="targetLang" id="targetLanguage">
                 <option value="en">EN</option>
                 <option value="de">DE</option>
             </select>
+            <br />
             <input id="searchInput" type='search' placeholder='Search' />
-            <ul id="translation-list">
+            <ul id="searchResultList">
 
             </ul>
-            <section id="newTranslation">
+		</section>
+        <section id="translations">
+
+            <!--
                 <input id="newTranslationText" type="text" placeholder="Enter new translation" />
                 <a href="#" id="addTranslation">Add</a>
-		    </section>
+                -->
 		</section>
     </div>
     <footer>

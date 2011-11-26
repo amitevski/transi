@@ -98,6 +98,7 @@
         el: $("#searchResults"),
 
         currentlySelectedId: 'en_Screen',
+        collection: null,
 
         events : {
             "keyup #searchInput": "search",
@@ -107,9 +108,9 @@
         },
 
         initialize: function() {
-            this.items_element = $("#translation-list");
+            this.items_element = $("#searchResultList");
             _.bindAll(this, 'render', 'search', 'changeLang', 'add', 'appendItem');
-            this.collection = new TranslationList();
+            //this.collection = new TranslationList();
             this.collection.bind('refresh', this.render);
             this.collection.bind('add', this.render);
         },
@@ -159,14 +160,14 @@
         },
 
         render: function () {
-            //translations.models = translations.models.slice(0, translations.limit);
             this.items_element.html("");
             _(this.collection.models).each(function(item){ // in case collection is not empty
                 this.appendItem(item);
             }, this);
         }
   });
-  new allSearchResultsView();
+    var translations = new TranslationList();
+    new allSearchResultsView({collection: translations});
 
 })(jQuery);
 
