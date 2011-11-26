@@ -99,6 +99,7 @@
 
         currentlySelectedId: 'en_Screen',
         collection: null,
+        translationsView: null,
 
         events : {
             "keyup #searchInput": "search",
@@ -109,10 +110,13 @@
 
         initialize: function() {
             this.items_element = $("#searchResultList");
-            _.bindAll(this, 'render', 'search', 'changeLang', 'add', 'appendItem');
-            //this.collection = new TranslationList();
+            _.bindAll(this, 'render', 'search', 'changeLang', 'add', 'appendItem', 'setTranslationsView');
             this.collection.bind('refresh', this.render);
             this.collection.bind('add', this.render);
+        },
+
+        setTranslationsView: function(view) {
+            this.translationsView = view;
         },
 
         add: function() {
@@ -156,6 +160,11 @@
         appendItem: function(item) {
             var view = new searchResultView({model: item}),
                     el = view.render(this.search).el;
+            var that = this;
+            $(el).bind('click', function(){
+                that.translationsView.setFromModel(item);
+                that.translationsView.render();
+            });
             this.items_element.append(el);
         },
 
@@ -166,7 +175,87 @@
             }, this);
         }
   });
+
+    var detailResultView = Backbone.View.extend({
+        fromModel: null,
+        model: null,
+
+        tagName: "li",
+
+        template: _.template('<span class="rating">Rating: <%= rating %></span>' + '   ' +
+                             '<span class="word"> Translation: <%= word %></span>' + '   ' +
+                             '<span class="example">Example: <%= example %></span>'),
+
+        initialize: function() {
+            _.bindAll(this, 'render', 'unrender');
+            this.fromModel = this.options.fromModel;
+            this.model = this.options.model;
+            this.model.bind('change', this.render);
+            this.model.view = this;
+        },
+
+        unrender: function() {
+            $(this.model.el).remove();
+            return this;
+        },
+
+        render: function() {
+            var model = this.model.toJSON();
+            model.rating = this.fromModel.rating;
+            var el = $(this.el);
+            el.html(this.template(model));
+            this.model.el = el;
+            return this;
+        }
+
+    });
+
+    var allTranslationsView = Backbone.View.extend({
+        el: $("#translations"),
+        fromModel: null,
+        collection: null,
+
+        events : {
+            "click #addTranslation": "add"
+        },
+
+        initialize: function() {
+            this.items_element = $("#searchResultList"); //we append our translations to this alement
+            _.bindAll(this, 'render', 'add', 'appendItem', 'setFromModel', 'unrender');
+            //this.collection.bind('refresh', this.render);
+            //this.collection.bind('add', this.render);
+        },
+
+        setFromModel: function(model) {
+            this.fromModel = model;
+        },
+
+        add: function() {
+            console.log('clicked add');
+        },
+
+        unrender: function() {
+            this.items_element.html("");
+        },
+
+        appendItem: function(item) {
+            var targetModel = this.collection.get(item._id)
+            var view = new detailResultView({'model': targetModel, 'fromModel': item}),
+                    el = view.render(this.search).el;
+            //$(el).bind('click', function(e){console.log('clicked translation');});
+            this.items_element.append(el);
+        },
+
+        render: function () {
+            this.unrender();
+            _(this.fromModel.get('translations')[this.collection.url]).each(function(item){ // in case collection is not empty
+                this.appendItem(item);
+            }, this);
+        }
+    });
     var translations = new TranslationList();
-    new allSearchResultsView({collection: translations});
+    var detailResults = new allTranslationsView({'collection': translations});
+    var searchResults = new allSearchResultsView({'collection': translations});
+    searchResults.setTranslationsView(detailResults);
 
 })(jQuery);

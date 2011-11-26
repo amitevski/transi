@@ -216,13 +216,15 @@ td { vertical-align: top; }
 }
 
 #searchBox {
-	position: relative;
-	top: 15em;
+}
+
+#searchInput {
+    margin: 10px;
 }
 
 #searchResults {
     position: relative;
-    top: 17em;
+    top: 15px;
 }
 
 ul {
