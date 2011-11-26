@@ -94,7 +94,7 @@
 
     });
 
-    var allSearchResultsView = Backbone.View.extend({
+    var searchResultListView = Backbone.View.extend({
         el: $("#searchResults"),
 
         currentlySelectedId: 'en_Screen',
@@ -182,8 +182,8 @@
 
         tagName: "li",
 
-        template: _.template('<span class="rating">Rating: <%= rating %></span>' + ' - ' +
-                             '<span class="word"> Translation: <%= word %></span>' + ' - ' +
+        template: _.template('<span class="rating">Rating: <%= rating %></span>' + '   ' +
+                             '<span class="word"> Translation: <%= word %></span>' + '   ' +
                              '<span class="example">Example: <%= example %></span>'),
 
         initialize: function() {
@@ -210,7 +210,7 @@
 
     });
 
-    var allTranslationsView = Backbone.View.extend({
+    var detailListView = Backbone.View.extend({
         el: $("#translations"),
         fromModel: null,
         collection: null,
@@ -254,9 +254,8 @@
         }
     });
     var translations = new TranslationList();
-
-    var searchResults = new allSearchResultsView({'collection': translations});
-    var detailResults = new allTranslationsView({'collection': translations});
+    var detailResults = new detailListView({'collection': translations});
+    var searchResults = new searchResultListView({'collection': translations});
     searchResults.setTranslationsView(detailResults);
 
 })(jQuery);

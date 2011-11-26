@@ -12,7 +12,10 @@
         }
     window.location.reload();
     });
-    
+
+    /**
+     * single translation model
+     */
     var Translation = Backbone.Model.extend({
         url: "word",
         defaults: {
@@ -51,7 +54,11 @@
         }
 
     });
-    
+
+
+    /**
+     * collection of models
+     */
     var TranslationList = Backbone.Collection.extend({
         url: "en",
         model: Translation,
@@ -59,6 +66,9 @@
     });
     
 
+    /**
+     * view for single search result
+     */
     var searchResultView = Backbone.View.extend({
         tagName: "li",
 
@@ -94,7 +104,10 @@
 
     });
 
-    var allSearchResultsView = Backbone.View.extend({
+    /**
+     * view for search result list
+     */
+    var searchResultListView = Backbone.View.extend({
         el: $("#searchResults"),
 
         currentlySelectedId: 'en_Screen',
@@ -176,6 +189,9 @@
         }
   });
 
+    /**
+     * view for single detail result
+     */
     var detailResultView = Backbone.View.extend({
         fromModel: null,
         model: null,
@@ -207,10 +223,12 @@
             this.model.el = el;
             return this;
         }
-
     });
 
-    var allTranslationsView = Backbone.View.extend({
+    /**
+     * list view for detail results
+     */
+    var detailListView = Backbone.View.extend({
         el: $("#translations"),
         fromModel: null,
         collection: null,
@@ -254,8 +272,8 @@
         }
     });
     var translations = new TranslationList();
-    var detailResults = new allTranslationsView({'collection': translations});
-    var searchResults = new allSearchResultsView({'collection': translations});
+    var detailResults = new detailListView({'collection': translations});
+    var searchResults = new searchResultListView({'collection': translations});
     searchResults.setTranslationsView(detailResults);
 
 })(jQuery);
