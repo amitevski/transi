@@ -106,7 +106,7 @@ Backbone.couch = {
         // custom implementation for transi
         _.each( result.rows, function( row, key, result ) {
           var model = row.doc;
-          if ( !model.id ) { model.id = row.id }
+          if ( !model.id ) { model.id = model._id }
           models.push( model );
         });
         // if no result then should result null

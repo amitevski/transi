@@ -16,7 +16,7 @@
     var Translation = Backbone.Model.extend({
         url: "word",
         defaults: {
-            rating: '0',
+            translations: {},
             example: 'Example sentence'
         },
 
@@ -37,13 +37,17 @@
          *
          * add _id, rating of new translation to current model
          * then add current models _id, rating:0 to new translation[this.lang]
-         * create new model in collection this.collection.create()
          *
-         * @param translation
+         * @param translation Backbone.Model
          */
         addTranslation: function(translation) {
-            this.translations[translation.lang].push(translation);
-            console.log(translation);
+            if (!this.get('translations')[translation.get('lang')]) {
+                this.get('translations')[translation.get('lang')] = [];
+            }
+            this.get('translations')[translation.get('lang')].push({
+                '_id': translation.get('_id'),
+                'rating': 0
+            });
         }
 
     });
@@ -54,7 +58,6 @@
         include_docs: true
     });
     
-    var translationList = new TranslationList();
 
     var searchResultView = Backbone.View.extend({
         tagName: "li",
@@ -76,11 +79,11 @@
         render: function() {
             var model = this.model.toJSON();
             if (!model.translations ||
-                !model.translations[translationList.url]) {
+                !model.translations[this.model.collection.url]) {
                 return this;
             }
             var toprated = this.model.collection.get(
-                                this.model.getToprated(translationList.url)._id);
+                                this.model.getToprated(this.model.collection.url)._id);
 
             model.translation = toprated.get('word');
             var el = $(this.el);
@@ -94,21 +97,43 @@
     var allSearchResultsView = Backbone.View.extend({
         el: $("#searchResults"),
 
+        currentlySelectedId: 'en_Screen',
+
         events : {
             "keyup #searchInput": "search",
+            "search #searchInput": "search",
+            "click #addTranslation": "add",
             "change #targetLanguage": "changeLang"
         },
 
         initialize: function() {
             this.items_element = $("#translation-list");
-            _.bindAll(this, 'render', 'search', 'changeLang');
-            translationList.bind('refresh', this.render);
+            _.bindAll(this, 'render', 'search', 'changeLang', 'add', 'appendItem');
+            this.collection = new TranslationList();
+            this.collection.bind('refresh', this.render);
+            this.collection.bind('add', this.render);
+        },
+
+        add: function() {
+            var input = $('#newTranslationText').val();
+            var currentModel = this.collection.get(this.currentlySelectedId);
+            var id = this.collection.url + '_' + input;
+            var newWord = new Translation({
+                '_id': id,
+                'id': id,
+                'word': input,
+                'lang': this.collection.url
+            });
+            newWord.addTranslation(currentModel);
+            currentModel.addTranslation(newWord);
+            currentModel.save();
+            this.collection.create(newWord,{'success':_.bind(this.search, this)});
         },
 
         changeLang: function() {
-            translationList.url = $("#targetLanguage").val();
+            this.collection.url = $("#targetLanguage").val();
             this.search();
-            console.log('selected lang' + translationList.url);
+            console.log('selected lang' + this.collection.url);
         },
 
         search: function() {
@@ -118,27 +143,28 @@
                 this.unrender();
                 return;
             }
-            translationList.startkey = searchText,
-            translationList.endkey = searchText+'\u9999';
-            translationList.fetch({success: _.bind(this.render, this)});
-            //this.render();
+            this.collection.startkey = searchText,
+            this.collection.endkey = searchText+'\u9999';
+            this.collection.fetch({success: _.bind(this.render, this)});
         },
 
         unrender: function() {
             this.items_element.html("");
         },
-    
+
+        appendItem: function(item) {
+            var view = new searchResultView({model: item}),
+                    el = view.render(this.search).el;
+            this.items_element.append(el);
+        },
+
         render: function () {
             //translations.models = translations.models.slice(0, translations.limit);
             this.items_element.html("");
-            var that = this;
-            translationList.each(function(item) {
-                var view = new searchResultView({model: item}),
-                    el = view.render(this.search).el;
-                that.items_element.append(el);
-          });
+            _(this.collection.models).each(function(item){ // in case collection is not empty
+                this.appendItem(item);
+            }, this);
         }
-
   });
   new allSearchResultsView();
 
