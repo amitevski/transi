@@ -211,8 +211,14 @@ td { vertical-align: top; }
    Author: 
    ========================================================================== */
 
+body {
+}
+#container {
+    text-align: center;
+    text-shadow: 2px 2px 2px lightGrey;
+    color: grey;
+}
 #main {
-	text-align: center;
 }
 
 #searchBox {
@@ -220,6 +226,11 @@ td { vertical-align: top; }
 
 #searchInput {
     margin: 10px;
+}
+
+input {
+    text-shadow: 2px 2px 2px lightGrey;
+    color: grey;
 }
 
 #searchResults {
@@ -231,6 +242,39 @@ ul {
     list-style: none;
 }
 
+
+li {
+    margin-left:auto;
+    margin-right:auto;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: inset 0px 0px 2px 2px #06266F;
+    -webkit-box-shadow: inset 0px 0px 2px 2px #06266F;
+    box-shadow: inset 0px 0px 2px 2px #06266F;
+    padding: 5px 15px;
+    overflow: hidden;
+}
+li.searchResult{
+    cursor: pointer;
+    width: 240px;
+}
+
+li.detailResult {
+    width: 480px;
+}
+/*
+.rating {
+    float: left;
+}
+.word {
+    float: left;
+}
+
+.translation {
+    float: right;
+}
+*/
 
 
 

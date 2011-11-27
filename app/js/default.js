@@ -12,7 +12,10 @@
         }
     window.location.reload();
     });
-    
+
+    /**
+     * single translation model
+     */
     var Translation = Backbone.Model.extend({
         url: "word",
         defaults: {
@@ -51,7 +54,11 @@
         }
 
     });
-    
+
+
+    /**
+     * collection of models
+     */
     var TranslationList = Backbone.Collection.extend({
         url: "en",
         model: Translation,
@@ -59,10 +66,15 @@
     });
     
 
+    /**
+     * view for single search result
+     */
     var searchResultView = Backbone.View.extend({
         tagName: "li",
+        className: "searchResult",
 
-        template: _.template('<span class="word"><%= word %></span>' + ' - ' +
+        template: _.template('<span class="word"><%= word %></span>' +
+                             '<span class="icon">&#008722;</span>' +
                              '<span class="translation"><%= translation %></span>'),
 
         initialize: function() {
@@ -78,14 +90,6 @@
 
         render: function() {
             var model = this.model.toJSON();
-            if (!model.translations ||
-                !model.translations[this.model.collection.url]) {
-                return this;
-            }
-            var toprated = this.model.collection.get(
-                                this.model.getToprated(this.model.collection.url)._id);
-
-            model.translation = toprated.get('word');
             var el = $(this.el);
             el.html(this.template(model));
             this.model.el = el;
@@ -94,6 +98,9 @@
 
     });
 
+    /**
+     * view for search result list
+     */
     var searchResultListView = Backbone.View.extend({
         el: $("#searchResults"),
 
@@ -155,10 +162,16 @@
 
         unrender: function() {
             this.items_element.html("");
+            this.translationsView.unrender();
         },
 
         appendItem: function(item) {
-            var view = new searchResultView({model: item}),
+            var toprated = this.collection.get(
+                                item.getToprated(this.collection.url)._id);
+
+            var tempItem = _.clone(item);
+            tempItem.set({'translation':toprated.get('word')}, {'silent': true});
+            var view = new searchResultView({model: tempItem}),
                     el = view.render(this.search).el;
             var that = this;
             $(el).bind('click', function(){
@@ -169,18 +182,28 @@
         },
 
         render: function () {
-            this.items_element.html("");
+            this.unrender();
             _(this.collection.models).each(function(item){ // in case collection is not empty
+                var model = item.toJSON();
+                //dont render item without translations for current language
+                if (!model.translations ||
+                    !model.translations[this.collection.url]) {
+                    return;
+                }
                 this.appendItem(item);
             }, this);
         }
   });
 
+    /**
+     * view for single detail result
+     */
     var detailResultView = Backbone.View.extend({
         fromModel: null,
         model: null,
 
         tagName: "li",
+        className: "detailResult",
 
         template: _.template('<span class="rating">Rating: <%= rating %></span>' + '   ' +
                              '<span class="word"> Translation: <%= word %></span>' + '   ' +
@@ -207,9 +230,11 @@
             this.model.el = el;
             return this;
         }
-
     });
 
+    /**
+     * list view for detail results
+     */
     var detailListView = Backbone.View.extend({
         el: $("#translations"),
         fromModel: null,
