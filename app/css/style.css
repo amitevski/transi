@@ -255,7 +255,7 @@ li {
     padding: 5px 15px;
     overflow: hidden;
 }
-li.searchResult{
+li.searchResult {
     cursor: pointer;
     width: 240px;
 }
@@ -263,6 +263,29 @@ li.searchResult{
 li.detailResult {
     width: 480px;
 }
+
+li.detailResult .rateUp,
+li.detailResult .rateDown {
+    cursor: pointer;
+    margin: 0 4px;
+}
+.rateUp:hover,
+.rateDown:hover {
+    background-color: LightBlue;
+}
+li.detailResult .rateDown {
+    position: relative;
+    top: 5px;
+    left: -16px;
+}
+
+li.detailResult .rateUp {
+    position: relative;
+    top: -5px;
+}
+
+
+
 /*
 .rating {
     float: left;

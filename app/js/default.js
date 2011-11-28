@@ -51,6 +51,26 @@
                 '_id': translation.get('_id'),
                 'rating': 0
             });
+        },
+
+        /**
+         * rateDown by one
+         *
+         * @param string lang
+         * @param int    key array key of the translation in translations[lang] of model
+         */
+        rateDown: function(lang, key) {
+            this.get('translations')[lang][key].rating--;
+        },
+
+        /**
+         * rateUp by one
+         *
+         * @param string lang
+         * @param int    key array key of the translation in translations[lang] of model
+         */
+        rateUp: function(lang, key) {
+            this.get('translations')[lang][key].rating++;
         }
 
     });
@@ -200,20 +220,24 @@
      */
     var detailResultView = Backbone.View.extend({
         fromModel: null,
+        fromModelKey: null,
         model: null,
 
         tagName: "li",
         className: "detailResult",
 
-        template: _.template('<span class="rating">Rating: <%= rating %></span>' + '   ' +
+        template: _.template('<span class="rating">Rating: <%= rating %></span>' +
+                             '<span class="rateUp"> &#000043;</span><span class="rateDown">&#008722;</span>   ' +
                              '<span class="word"> Translation: <%= word %></span>' + '   ' +
                              '<span class="example">Example: <%= example %></span>'),
 
         initialize: function() {
             _.bindAll(this, 'render', 'unrender');
             this.fromModel = this.options.fromModel;
+            this.fromModelKey = this.options.fromModelKey;
             this.model = this.options.model;
             this.model.bind('change', this.render);
+            this.fromModel.bind('change', this.render);
             this.model.view = this;
         },
 
@@ -223,10 +247,20 @@
         },
 
         render: function() {
-            var model = this.model.toJSON();
-            model.rating = this.fromModel.rating;
+            var model = _.clone(this.model);
+            var fromModelTranslation = this.fromModel.get('translations')[this.model.collection.url][this.fromModelKey];
+            model.set({'rating': fromModelTranslation.rating}, {'silent': true});
             var el = $(this.el);
-            el.html(this.template(model));
+            el.html(this.template(model.toJSON()));
+            var that = this;
+            $('.rateUp', el).bind('click', function(){
+                that.fromModel.rateUp(that.fromModel.collection.url, that.fromModelKey);
+                that.fromModel.save();
+            });
+            $('.rateDown', el).bind('click', function(){
+                that.fromModel.rateDown(that.fromModel.collection.url, that.fromModelKey);
+                that.fromModel.save();
+            });
             this.model.el = el;
             return this;
         }
@@ -263,9 +297,10 @@
             this.items_element.html("");
         },
 
-        appendItem: function(item) {
-            var targetModel = this.collection.get(item._id)
-            var view = new detailResultView({'model': targetModel, 'fromModel': item}),
+        appendItem: function(item, key) {
+            var targetModel = this.collection.get(item._id);
+            var view = new detailResultView({
+                'model': targetModel, 'fromModel': this.fromModel, 'fromModelKey': key}),
                     el = view.render(this.search).el;
             //$(el).bind('click', function(e){console.log('clicked translation');});
             this.items_element.append(el);
@@ -273,8 +308,8 @@
 
         render: function () {
             this.unrender();
-            _(this.fromModel.get('translations')[this.collection.url]).each(function(item){ // in case collection is not empty
-                this.appendItem(item);
+            _(this.fromModel.get('translations')[this.collection.url]).each(function(item, key){ // in case collection is not empty
+                this.appendItem(item, key);
             }, this);
         }
     });
